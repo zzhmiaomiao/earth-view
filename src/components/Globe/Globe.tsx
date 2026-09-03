@@ -11,6 +11,7 @@ import { latLonToVector, normalizeLongitude, pointToLatLon } from "@/lib/geo";
 import { BoundaryLines } from "./BoundaryLines";
 import { CityLabels } from "./CityLabels";
 import { Earth, PlaceholderEarth } from "./Earth";
+import { RssChangeOverlay } from "./RssChangeOverlay";
 import { ActivityHoverPopup } from "./EventOverlays/ActivityHoverPopup";
 import { EarthquakeMarkers } from "./EventOverlays/EarthquakeMarkers";
 import { StormTracks } from "./EventOverlays/StormTracks";
@@ -264,7 +265,10 @@ function AdaptiveControls() {
     }
 
     if (focusRequest && focusRequest.nonce !== lastFocusNonce.current) {
-      const distance = Math.max(MIN_GLOBE_DISTANCE, camera.position.distanceTo(controls.target));
+      const distance = Math.max(
+        MIN_GLOBE_DISTANCE,
+        focusRequest.distance ?? camera.position.distanceTo(controls.target),
+      );
       const direction = latLonToVector(focusRequest.lat, focusRequest.lon).normalize();
       const originalDamping = controls.enableDamping;
 
@@ -347,7 +351,12 @@ function AdaptiveControls() {
   );
 }
 
-export function Globe() {
+type GlobeProps = {
+  rssGeojsonUrl?: string | null;
+  rssVisible?: boolean;
+};
+
+export function Globe({ rssGeojsonUrl = null, rssVisible = false }: GlobeProps) {
   const date = useAppStore((state) => state.date);
   const layerId = useAppStore((state) => state.layerId);
   const imageryVisible = useAppStore((state) => state.imageryVisible);
@@ -440,6 +449,7 @@ export function Globe() {
           />
         </Suspense>
         {boundaryLinesVisible ? <BoundaryLines /> : null}
+        <RssChangeOverlay geojsonUrl={rssGeojsonUrl} visible={rssVisible} />
         <CityLabels />
         {activityOverlays.earthquakes ? <EarthquakeMarkers /> : null}
         {activityOverlays.volcanoes ? <VolcanoMarkers /> : null}

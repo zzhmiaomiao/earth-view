@@ -21,6 +21,7 @@ import { buildGibsWmsUrl } from "@/providers/GibsProvider";
 import { getImageryProvider } from "@/providers/registry";
 import { useAppStore } from "@/store/useAppStore";
 import type { BoundingBox } from "@/types/imagery";
+import { RssChangeMapOverlay } from "./RssChangeMapOverlay";
 
 const MAX_IMAGE_SIZE = 1800;
 const DETAILED_BOUNDARY_LAYER_ID = "Reference_Features";
@@ -142,7 +143,13 @@ function preloadImage(url: string) {
   });
 }
 
-export function MaxZoomImagery() {
+export function MaxZoomImagery({
+  rssGeojsonUrl = null,
+  rssVisible = false,
+}: {
+  rssGeojsonUrl?: string | null;
+  rssVisible?: boolean;
+}) {
   const globeView = useAppStore((state) => state.globeView);
   const date = useAppStore((state) => state.date);
   const layerId = useAppStore((state) => state.layerId);
@@ -1090,6 +1097,13 @@ export function MaxZoomImagery() {
           {updatingMessage}
         </div>
       )}
+
+      <RssChangeMapOverlay
+        geojsonUrl={rssGeojsonUrl}
+        visible={rssVisible}
+        bbox={labelBbox}
+        imageTransform={imageTransform}
+      />
 
       {error && (
         <div className="pointer-events-none absolute inset-x-4 bottom-8 mx-auto max-w-md rounded-md border border-destructive/30 bg-background/80 px-3 py-2 text-center text-sm text-destructive shadow-xl backdrop-blur">

@@ -34,6 +34,7 @@ type GlobeFocusRequest = {
   lat: number;
   lon: number;
   immediate: boolean;
+  distance?: number;
   nonce: number;
 };
 
@@ -91,7 +92,7 @@ type AppState = {
   focusGlobeAt: (
     lat: number,
     lon: number,
-    options?: { immediate?: boolean; syncView?: boolean },
+    options?: { immediate?: boolean; syncView?: boolean; distance?: number },
   ) => void;
   requestGlobeZoom: (deltaY: number, shiftKey?: boolean) => void;
   syncGlobeDetailView: (
@@ -196,6 +197,7 @@ export const useAppStore = create<AppState>((set) => ({
         lat,
         lon,
         immediate: options?.immediate ?? false,
+        distance: options?.distance,
         nonce: (state.globeFocusRequest?.nonce ?? 0) + 1,
       },
       globeView: (options?.syncView ?? true) && state.globeView
